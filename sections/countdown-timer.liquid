@@ -5,17 +5,17 @@
   style="{% render 'spacing-padding', settings: section.settings %}"
 >
   <div class="countdown-timer-card" id="countdown-{{ section.id }}">
-    {%- if section.settings.eyebrow != blank -%}
-      <span class="countdown-timer__eyebrow">{{ section.settings.eyebrow }}</span>
-    {%- endif -%}
+    <span class="countdown-timer__eyebrow">
+      {{ section.settings.eyebrow | default: 'Limited time' }}
+    </span>
 
-    {%- if section.settings.heading != blank -%}
-      <h2 class="countdown-timer__heading">{{ section.settings.heading }}</h2>
-    {%- endif -%}
+    <h2 class="countdown-timer__heading">
+      {{ section.settings.heading | default: 'Hurry! Offer ends in' }}
+    </h2>
 
-    {%- if section.settings.subheading != blank -%}
-      <p class="countdown-timer__subheading">{{ section.settings.subheading }}</p>
-    {%- endif -%}
+    <p class="countdown-timer__subheading">
+      {{ section.settings.subheading | default: "Don't miss out — grab the deal before the timer runs out." }}
+    </p>
 
     <div
       class="countdown-timer"
@@ -43,11 +43,12 @@
       </div>
     </div>
 
-    {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
-      <a class="countdown-timer__button" href="{{ section.settings.button_link }}">
-        {{ section.settings.button_label }}
-      </a>
-    {%- endif -%}
+    <a
+      class="countdown-timer__button"
+      href="{{ section.settings.button_link | default: '/collections/all' }}"
+    >
+      {{ section.settings.button_label | default: 'Shop now' }}
+    </a>
   </div>
 </div>
 

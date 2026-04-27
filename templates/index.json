@@ -87,12 +87,16 @@
     "countdown_timer_main": {
       "type": "countdown-timer",
       "settings": {
+        "eyebrow": "Limited time",
         "heading": "Hurry! Offer ends in",
+        "subheading": "Don't miss out — grab the deal before the timer runs out.",
         "duration_minutes": 60,
+        "button_label": "Shop now",
+        "button_link": "/collections/all",
         "color_scheme": "scheme-1",
         "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "padding-block-start": 48,
+        "padding-block-end": 48
       }
     },
     "product_list_fa6P9H": {
