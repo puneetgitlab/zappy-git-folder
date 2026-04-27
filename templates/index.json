@@ -84,6 +84,17 @@
         "padding-block-end": 72
       }
     },
+    "countdown_timer_main": {
+      "type": "countdown-timer",
+      "settings": {
+        "heading": "Hurry! Offer ends in",
+        "duration_minutes": 60,
+        "color_scheme": "scheme-1",
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
     "product_list_fa6P9H": {
       "type": "product-list",
       "blocks": {
@@ -281,6 +292,7 @@
   },
   "order": [
     "hero_jVaWmY",
+    "countdown_timer_main",
     "product_list_fa6P9H"
   ]
 }
