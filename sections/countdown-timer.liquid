@@ -1,20 +1,26 @@
 
-
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div
-  class="section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }} countdown-timer-section"
-  style="padding-block-start: {{ section.settings.padding-block-start }}px; padding-block-end: {{ section.settings.padding-block-end }}px;"
+  class="section section--{{ section.settings.section_width }} spacing-style {% if section.settings.color_scheme != blank %}color-{{ section.settings.color_scheme }}{% endif %} countdown-timer-section"
+  style="{% render 'spacing-padding', settings: section.settings %}"
 >
-  <div
-    class="countdown-timer-card"
-    data-countdown-id="countdown-{{ section.id }}"
-    data-countdown-duration="{{ section.settings.duration_minutes | times: 60 }}"
-  >
-    <span class="countdown-timer__eyebrow">{{ section.settings.eyebrow }}</span>
-    <h2 class="countdown-timer__heading">{{ section.settings.heading }}</h2>
-    <p class="countdown-timer__subheading">{{ section.settings.subheading }}</p>
+  <div class="countdown-timer-card" id="countdown-{{ section.id }}">
+    <span class="countdown-timer__eyebrow">
+      {{ section.settings.eyebrow | default: 'Limited time' }}
+    </span>
 
-    <div class="countdown-timer">
+    <h2 class="countdown-timer__heading">
+      {{ section.settings.heading | default: 'Hurry! Offer ends in' }}
+    </h2>
+
+    <p class="countdown-timer__subheading">
+      {{ section.settings.subheading | default: "Don't miss out — grab the deal before the timer runs out." }}
+    </p>
+
+    <div
+      class="countdown-timer"
+      data-countdown-duration="{{ section.settings.duration_minutes | times: 60 | default: 3600 }}"
+    >
       <div class="countdown-timer__unit">
         <div class="countdown-timer__tile">
           <span class="countdown-timer__value" data-countdown-hours>00</span>
@@ -31,47 +37,63 @@
       <span class="countdown-timer__separator" aria-hidden="true">:</span>
       <div class="countdown-timer__unit">
         <div class="countdown-timer__tile">
-          <span class="countdown-timer__value" data-countdown-seconds>00</span>
+          <span class="countdown-timer__value countdown-timer__value--pulse" data-countdown-seconds>00</span>
         </div>
         <span class="countdown-timer__label">Seconds</span>
       </div>
     </div>
 
-    <a class="countdown-timer__button" href="{{ section.settings.button_link }}">
-      {{ section.settings.button_label }}
+    <a
+      class="countdown-timer__button"
+      href="{{ section.settings.button_link | default: '/collections/all' }}"
+    >
+      {{ section.settings.button_label | default: 'Shop now' }}
     </a>
   </div>
 </div>
 
-{% javascript %}
-  document.querySelectorAll('.countdown-timer-card').forEach(function (card) {
-    if (card.dataset.countdownInit === '1') return;
-    card.dataset.countdownInit = '1';
+<script>
+  (function () {
+    const root = document.getElementById('countdown-{{ section.id }}');
+    if (!root) return;
+    const timerEl = root.querySelector('.countdown-timer');
+    if (!timerEl) return;
 
-    var duration = parseInt(card.dataset.countdownDuration, 10) || 3600;
-    var endTime = Date.now() + duration * 1000;
+    const duration = parseInt(timerEl.dataset.countdownDuration, 10) || 3600;
+    const endTime = Date.now() + duration * 1000;
 
-    var hoursEl = card.querySelector('[data-countdown-hours]');
-    var minutesEl = card.querySelector('[data-countdown-minutes]');
-    var secondsEl = card.querySelector('[data-countdown-seconds]');
+    const hoursEl = timerEl.querySelector('[data-countdown-hours]');
+    const minutesEl = timerEl.querySelector('[data-countdown-minutes]');
+    const secondsEl = timerEl.querySelector('[data-countdown-seconds]');
 
-    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    const pad = (n) => (n < 10 ? '0' + n : '' + n);
+
+    function update(el, val) {
+      const padded = pad(val);
+      if (el.textContent !== padded) {
+        el.textContent = padded;
+        el.classList.remove('is-tick');
+        // Force reflow to restart animation
+        void el.offsetWidth;
+        el.classList.add('is-tick');
+      }
+    }
 
     function tick() {
-      var remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-      hoursEl.textContent = pad(Math.floor(remaining / 3600));
-      minutesEl.textContent = pad(Math.floor((remaining % 3600) / 60));
-      secondsEl.textContent = pad(remaining % 60);
+      const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+      update(hoursEl, Math.floor(remaining / 3600));
+      update(minutesEl, Math.floor((remaining % 3600) / 60));
+      update(secondsEl, remaining % 60);
       if (remaining <= 0) {
         clearInterval(timer);
-        card.classList.add('is-expired');
+        root.classList.add('is-expired');
       }
     }
 
     tick();
-    var timer = setInterval(tick, 1000);
-  });
-{% endjavascript %}
+    const timer = setInterval(tick, 1000);
+  })();
+</script>
 
 {% stylesheet %}
   .countdown-timer-section {
@@ -94,7 +116,21 @@
     color: #fff;
     box-shadow:
       0 24px 60px -20px rgba(0, 0, 0, 0.45),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  }
+
+  .countdown-timer-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 26px;
+    padding: 2px;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.45), rgba(236, 72, 153, 0.0) 40%, rgba(59, 130, 246, 0.35));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 
   .countdown-timer__eyebrow {
@@ -117,7 +153,10 @@
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.15;
-    color: #ffffff;
+    background: linear-gradient(180deg, #ffffff 0%, #c9c9d4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .countdown-timer__subheading {
@@ -152,8 +191,21 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow:
       0 6px 16px -8px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+      0 1px 0 0 rgba(255, 255, 255, 0.08) inset;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     overflow: hidden;
+  }
+
+  .countdown-timer__tile::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    pointer-events: none;
   }
 
   .countdown-timer__value {
@@ -163,8 +215,25 @@
     line-height: 1;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
-    color: #ffffff;
+    color: #fff;
     text-shadow: 0 2px 12px rgba(168, 85, 247, 0.25);
+  }
+
+  .countdown-timer__value.is-tick {
+    animation: countdown-tick 0.45s ease-out;
+  }
+
+  @keyframes countdown-tick {
+    0% {
+      transform: translateY(-6px);
+      opacity: 0;
+      filter: blur(2px);
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+      filter: blur(0);
+    }
   }
 
   .countdown-timer__label {
@@ -198,12 +267,15 @@
     background: linear-gradient(135deg, #ffffff 0%, #e9e9f0 100%);
     box-shadow:
       0 8px 22px -10px rgba(255, 255, 255, 0.5),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+      0 0 0 1px rgba(255, 255, 255, 0.18) inset;
     transition: transform 0.18s ease, box-shadow 0.18s ease;
   }
 
   .countdown-timer__button:hover {
     transform: translateY(-1px);
+    box-shadow:
+      0 14px 30px -10px rgba(255, 255, 255, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.28) inset;
     text-decoration: none;
   }
 
@@ -215,6 +287,10 @@
     .countdown-timer-card {
       padding: 36px 20px;
       border-radius: 20px;
+    }
+
+    .countdown-timer {
+      gap: 8px;
     }
 
     .countdown-timer__tile {
@@ -249,17 +325,14 @@
       "type": "text",
       "id": "subheading",
       "label": "Subheading",
-      "default": "Don't miss out before the timer runs out."
+      "default": "Don't miss out — grab the deal before the timer runs out."
     },
     {
-      "type": "range",
+      "type": "number",
       "id": "duration_minutes",
       "label": "Duration (minutes)",
-      "min": 1,
-      "max": 100,
-      "step": 1,
-      "unit": "min",
-      "default": 60
+      "default": 60,
+      "info": "How many minutes the timer counts down from page load."
     },
     {
       "type": "text",
@@ -275,27 +348,33 @@
     {
       "type": "color_scheme",
       "id": "color_scheme",
-      "label": "Color scheme",
+      "label": "t:settings.color_scheme",
       "default": "scheme-1"
     },
     {
       "type": "select",
       "id": "section_width",
-      "label": "Width",
+      "label": "t:settings.width",
       "options": [
-        { "value": "page-width", "label": "Page" },
-        { "value": "full-width", "label": "Full" }
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
       ],
       "default": "page-width"
     },
     {
       "type": "header",
-      "content": "Padding"
+      "content": "t:content.padding"
     },
     {
       "type": "range",
       "id": "padding-block-start",
-      "label": "Top",
+      "label": "t:settings.top",
       "min": 0,
       "max": 100,
       "step": 1,
@@ -305,7 +384,7 @@
     {
       "type": "range",
       "id": "padding-block-end",
-      "label": "Bottom",
+      "label": "t:settings.bottom",
       "min": 0,
       "max": 100,
       "step": 1,
@@ -316,7 +395,10 @@
   "presets": [
     {
       "name": "Countdown timer",
-      "category": "Layout"
+      "category": "t:categories.layout",
+      "settings": {
+        "duration_minutes": 60
+      }
     }
   ]
 }

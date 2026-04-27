@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "hero_jVaWmY": {
       "type": "hero",
@@ -61,6 +62,7 @@
       "settings": {
         "media_type_1": "image",
         "media_type_2": "image",
+        "link": "",
         "open_in_new_tab": false,
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -82,21 +84,6 @@
         "reflection_opacity": 75,
         "padding-block-start": 100,
         "padding-block-end": 72
-      }
-    },
-    "countdown_timer_main": {
-      "type": "countdown-timer",
-      "settings": {
-        "eyebrow": "Limited time",
-        "heading": "Hurry! Offer ends in",
-        "subheading": "Don't miss out — grab the deal before the timer runs out.",
-        "duration_minutes": 60,
-        "button_label": "Shop now",
-        "button_link": "/collections/all",
-        "color_scheme": "scheme-1",
-        "section_width": "page-width",
-        "padding-block-start": 48,
-        "padding-block-end": 48
       }
     },
     "product_list_fa6P9H": {
@@ -292,11 +279,27 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "countdown_timer_r6UmQy": {
+      "type": "countdown-timer",
+      "name": "Countdown timer",
+      "settings": {
+        "eyebrow": "Limited time",
+        "heading": "Hurry! Offer ends in",
+        "subheading": "Don't miss out — grab the deal before the timer runs out.",
+        "duration_minutes": 60,
+        "button_label": "Shop now",
+        "button_link": "",
+        "color_scheme": "",
+        "section_width": "page-width",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
     }
   },
   "order": [
     "hero_jVaWmY",
-    "countdown_timer_main",
-    "product_list_fa6P9H"
+    "product_list_fa6P9H",
+    "countdown_timer_r6UmQy"
   ]
 }
